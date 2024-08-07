@@ -1,14 +1,14 @@
 const editor = document.getElementById('editor')
 const title = document.getElementById('title')
-const documentID = localStorage.getItem('documentId') || null;
+let documentId = localStorage.getItem('documentId') || null;
 
 const getContent = () => {
-    return {title : title.value , content : editor.value , documentID : documentID} 
+    return {title : title.value , content : editor.value , documentId : documentId} 
 }
 
 const autosave = async () => {
-    const {title,content} = getContent()
-
+    let {title,content,documentId} = getContent();
+    console.log(documentId);
     if (title || content) {
         try{
             const response = await fetch('/autosave',{
@@ -16,15 +16,16 @@ const autosave = async () => {
                 headers : {
                     'Content-Type' : 'application/json',
                 },
-                body : JSON.stringify({title,content,documentID}),
+                body : JSON.stringify({title,content,documentId}),
             });
 
             const result = await response.json();
-            if(!documentID && result.documentId){
-                documentID = result.documentId;
-                localStorage.setItem('documentId',documentID);
+            console.log(result)
+            if(!documentId && result.documentId){
+                documentId = result.documentId;
+                localStorage.setItem('documentId' , documentId);
             }
-            console.log('Content autosaved');
+            console.log('Document autosaved');
         } catch(error){
             console.error('Failed to autosave', error);
         }
