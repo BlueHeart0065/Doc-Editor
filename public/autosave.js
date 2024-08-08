@@ -1,14 +1,22 @@
 const editor = document.getElementById('editor')
 const title = document.getElementById('title')
-let documentId = localStorage.getItem('documentId') || null;
+
+const CreateNewDoc = async () => {
+    try{
+        const response = await fetch('/docs/new', {method : 'POST'});
+        const {documentId} = response.json();
+    }
+    catch(error){
+        console.error('Error in fetching new doc route ---->', error);
+    }
+}
 
 const getContent = () => {
-    return {title : title.value , content : editor.value , documentId : documentId} 
+    return {title : title.value , content : editor.value } 
 }
 
 const autosave = async () => {
-    let {title,content,documentId} = getContent();
-    console.log(documentId);
+    let {title,content} = getContent();
     if (title || content) {
         try{
             const response = await fetch('/autosave',{
@@ -16,21 +24,19 @@ const autosave = async () => {
                 headers : {
                     'Content-Type' : 'application/json',
                 },
-                body : JSON.stringify({title,content,documentId}),
+                body : JSON.stringify({title,content}),
             });
 
             const result = await response.json();
             console.log(result)
-            if(!documentId && result.documentId){
-                documentId = result.documentId;
-                localStorage.setItem('documentId' , documentId);
-            }
             console.log('Document autosaved');
         } catch(error){
             console.error('Failed to autosave', error);
         }
     }
 };
+
+
 
 function debounce(func, wait) {
     let timeout;

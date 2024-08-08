@@ -3,6 +3,8 @@ const path = require('path');
 const mongoose = require('mongoose');
 const Doc = require('./models/Doc');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
 
 const app = express();
 app.set('view engine','ejs');
@@ -19,19 +21,48 @@ mongoose.connect('mongodb://localhost/ProjectDocs')
     console.log('Connection error', err);
 })
 
+
+app.use(session({
+    secret : 'mysecretistatya',
+    resave: false,
+    saveUninitialized : true,
+    store : new MongoStore({mongooseConnection : mongoose.connection}),
+    cookie : {maxAge: 60000*60*24}
+}))
+
+
 app.get('/docs',async (req,res) => {
-    const docs = await Doc.find({});
-    res.render('Index.ejs', {docs});
+    try{
+        const docs = await Doc.find({});
+        res.render('Index.ejs', {docs});
+    }
+    catch(error){
+        console.error(error);
+    }
 })
 
-app.get('/docs/:id', async (req,res) => {
-    const id = req.params.id;
-    const doc = await Doc.findById(id);
-    res.render('Doc.ejs', {doc});
-})
+app.post('/docs/new', async (req,res) => {
+    try{
+        const document = new Doc({title : '', content : ''});
+        await document.save();
+        res.session.documentId = document._id;
+        res.json({documentId : document._id});
+        res.redirect(`/docs/${document._id}/edit`);
+    }
+    catch(error){
+        console.error('Failed to create and save new blank document ---->',error );
+    }
+});
 
-app.get('/docs/new', async (req,res) => {
-    res.render('New.ejs');
+app.get('/docs/:id/edit', async (req,res) => {
+    try{
+        const id = req.params.id;
+        const doc = await Doc.findById(id);
+        res.render('Edit.ejs', {doc});
+    }
+    catch(error){
+        console.error('Failed to find the document--->', error);
+    }
 })
 
 app.post('/autosave', async (req,res) => {
