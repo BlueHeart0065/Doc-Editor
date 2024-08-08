@@ -1,16 +1,6 @@
 const editor = document.getElementById('editor')
 const title = document.getElementById('title')
 
-const CreateNewDoc = async () => {
-    try{
-        const response = await fetch('/docs/new', {method : 'POST'});
-        const {documentId} = response.json();
-    }
-    catch(error){
-        console.error('Error in fetching new doc route ---->', error);
-    }
-}
-
 const getContent = () => {
     return {title : title.value , content : editor.value } 
 }
@@ -35,7 +25,6 @@ const autosave = async () => {
         }
     }
 };
-
 
 
 function debounce(func, wait) {

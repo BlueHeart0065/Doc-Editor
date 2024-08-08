@@ -26,7 +26,7 @@ app.use(session({
     secret : 'mysecretistatya',
     resave: false,
     saveUninitialized : true,
-    store : new MongoStore({mongooseConnection : mongoose.connection}),
+    store : MongoStore.create({mongoUrl : 'mongodb://localhost:27017/ProjectDocs'}),
     cookie : {maxAge: 60000*60*24}
 }))
 
@@ -45,9 +45,9 @@ app.post('/docs/new', async (req,res) => {
     try{
         const document = new Doc({title : '', content : ''});
         await document.save();
-        res.session.documentId = document._id;
-        res.json({documentId : document._id});
-        res.redirect(`/docs/${document._id}/edit`);
+        req.session.documentId = document.id;
+        res.json({documentId : document.id});
+        // res.redirect(`/docs/${document.id}/edit`);
     }
     catch(error){
         console.error('Failed to create and save new blank document ---->',error );
