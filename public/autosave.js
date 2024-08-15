@@ -1,16 +1,18 @@
 const editor = document.getElementById('editor')
 const title = document.getElementById('title')
-const documentId = document.getElementById('id')
+const documentId = document.getElementById('id');
 
 const getContent = () => {
-    return {title : title.value , content : editor.value ,documentId : documentId.value} 
+    return {title : title.value , content : editor.value ,documentId : documentId.innerHTML} 
 }
 
 const autosave = async () => {
     let {title,content,documentId} = getContent();
+    // console.log(JSON.stringify({documentId}));
+    const route = '/docs/' + documentId + "/edit";
     if (title || content) {
         try{
-            const response = await fetch(`/docs/${id}/edit`,{
+            await fetch(route,{
                 method : 'POST',
                 headers : {
                     'Content-Type' : 'application/json',
@@ -18,13 +20,14 @@ const autosave = async () => {
                 body : JSON.stringify({title,content,documentId}),
             });
 
-            const result = await response.json();
-            console.log(result)
+            // const result = await response.json();
+            // console.log(result)
             console.log('Document autosaved');
         } catch(error){
             console.error('Failed to autosave', error);
         }
     }
+
 };
 
 

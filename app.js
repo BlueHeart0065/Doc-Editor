@@ -10,6 +10,7 @@ const app = express();
 app.set('view engine','ejs');
 app.set('views',path.join(__dirname,'views'));
 app.use(express.urlencoded({extended: true}));
+app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
@@ -60,7 +61,8 @@ app.get('/docs/:id/edit', async (req,res) => {
     try{
         const id = req.params.id;
         const doc = await Doc.findById(id);
-        res.render('Edit.ejs', {doc});
+        console.log(doc)
+        res.render('Edit.ejs', {doc : doc, id : id});
     }
     catch(error){
         console.error('Failed to find the document--->', error);
@@ -68,9 +70,9 @@ app.get('/docs/:id/edit', async (req,res) => {
 })
 
 app.post('/docs/:id/edit', async (req,res) => {
-    console.log(req.body);
+    console.log('reached here');
     const {title , content, documentId } = req.body;
-    
+    console.log(documentId)
     try{
         let document;
         if(documentId){
