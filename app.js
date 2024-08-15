@@ -42,12 +42,14 @@ app.get('/docs',async (req,res) => {
 })
 
 app.post('/docs/new', async (req,res) => {
+
     try{
-        const document = new Doc({title : '', content : ''});
+        const currentDate = new Date()
+        const document = new Doc({title : `Untitled${currentDate}`, content : ''});
         await document.save();
         req.session.documentId = document.id;
-        res.json({documentId : document.id});
-        // res.redirect(`/docs/${document.id}/edit`);
+        // res.json({documentId : document.id});
+        res.redirect(`/docs/${document.id}/edit`);
     }
     catch(error){
         console.error('Failed to create and save new blank document ---->',error );
@@ -65,7 +67,7 @@ app.get('/docs/:id/edit', async (req,res) => {
     }
 })
 
-app.post('/autosave', async (req,res) => {
+app.post('/docs/:id/edit', async (req,res) => {
     console.log(req.body);
     const {title , content, documentId } = req.body;
     
@@ -78,7 +80,8 @@ app.post('/autosave', async (req,res) => {
                 document.title = title || document.title;
                 document.content = content || document.content;
                 await document.save();
-                return res.status(200).json({documentId : document._id});
+                console.log('Autosaved')
+                return res.status(200);
             }
             catch(error) {
                 console.error('Error fetching doc ID ----------->',error);

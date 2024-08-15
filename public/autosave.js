@@ -1,20 +1,21 @@
 const editor = document.getElementById('editor')
 const title = document.getElementById('title')
+const documentId = document.getElementById('id')
 
 const getContent = () => {
-    return {title : title.value , content : editor.value } 
+    return {title : title.value , content : editor.value ,documentId : documentId.value} 
 }
 
 const autosave = async () => {
-    let {title,content} = getContent();
+    let {title,content,documentId} = getContent();
     if (title || content) {
         try{
-            const response = await fetch('/autosave',{
+            const response = await fetch(`/docs/${id}/edit`,{
                 method : 'POST',
                 headers : {
                     'Content-Type' : 'application/json',
                 },
-                body : JSON.stringify({title,content}),
+                body : JSON.stringify({title,content,documentId}),
             });
 
             const result = await response.json();

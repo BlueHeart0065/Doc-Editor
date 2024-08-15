@@ -10,8 +10,7 @@
         <button name="new" id="new">+ New Doc</button>
     </form>
     <% for (let doc of docs) {%>
-        <li><p><%= doc.title%> - </p><a href="/docs/<%= doc.id %>">Link</a></li>
+        <li><p><%= doc.title%> - </p><a href="/docs/<%= doc.id %>/edit">Link</a></li>
     <% } %>
-    <script src="./generateID.js"></script>
 </body>
 </html>
