@@ -35,21 +35,37 @@ app.use(session({
 app.get('/docs',async (req,res) => {
     try{
         const docs = await Doc.find({});
-        res.render('Index.ejs', {docs});
+        res.render('Index.ejs', {docs, serachedDocs : null});
     }
     catch(error){
         console.error(error);
     }
 })
 
+app.get('/docs/search', async(req,res) => {
+    try{
+        const searchTerm = req.query.q;
+        const results = await Doc.find({
+            $or: [
+              { title: { $regex: searchTerm, $options: 'i' } }, 
+              { content: { $regex: searchTerm, $options: 'i' } }
+            ]
+        });
+        
+        res.redirect('/docs', {serachedDocs : results})
+        res.json(results);
+    }
+    catch(error){
+        console.error('Failed search --------->', error)
+    }
+})
+
 app.post('/docs/new', async (req,res) => {
 
     try{
-        const currentDate = new Date()
-        const document = new Doc({title : `Untitled${currentDate}`, content : ''});
+        const document = new Doc({title : `Untitled Document`, content : ''});
         await document.save();
         req.session.documentId = document.id;
-        // res.json({documentId : document.id});
         res.redirect(`/docs/${document.id}/edit`);
     }
     catch(error){
@@ -61,7 +77,6 @@ app.get('/docs/:id/edit', async (req,res) => {
     try{
         const id = req.params.id;
         const doc = await Doc.findById(id);
-        console.log(doc)
         res.render('Edit.ejs', {doc : doc, id : id});
     }
     catch(error){
@@ -70,9 +85,7 @@ app.get('/docs/:id/edit', async (req,res) => {
 })
 
 app.post('/docs/:id/edit', async (req,res) => {
-    console.log('reached here');
     const {title , content, documentId } = req.body;
-    console.log(documentId)
     try{
         let document;
         if(documentId){
@@ -80,7 +93,9 @@ app.post('/docs/:id/edit', async (req,res) => {
                 console.log(documentId);
                 document = await Doc.findById(documentId);
                 document.title = title || document.title;
+                currentDate = new Date
                 document.content = content || document.content;
+                document.updatedAt = currentDate || document.updatedAt;
                 await document.save();
                 console.log('Autosaved')
                 return res.status(200);
@@ -90,10 +105,7 @@ app.post('/docs/:id/edit', async (req,res) => {
             }
         }
         else{
-            console.log('documentID not found');
-            document = new Doc({title, content});
-            document.save();
-            res.status(200).json({documentId: document._id});
+            console.log('documentID not found, Changes not saved');
         }
     }
     catch(error){

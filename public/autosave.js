@@ -8,7 +8,6 @@ const getContent = () => {
 
 const autosave = async () => {
     let {title,content,documentId} = getContent();
-    // console.log(JSON.stringify({documentId}));
     const route = '/docs/' + documentId + "/edit";
     if (title || content) {
         try{
