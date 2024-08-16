@@ -45,15 +45,20 @@ app.get('/docs',async (req,res) => {
 app.get('/docs/search', async(req,res) => {
     try{
         const searchTerm = req.query.q;
-        const results = await Doc.find({
-            $or: [
-              { title: { $regex: searchTerm, $options: 'i' } }, 
-              { content: { $regex: searchTerm, $options: 'i' } }
-            ]
-        });
-        
-        res.redirect('/docs', {serachedDocs : results})
-        res.json(results);
+        if(searchTerm){
+            const docs = await Doc.find({
+                $or: [
+                    { title: { $regex: searchTerm, $options: 'i' } }, 
+                    { content: { $regex: searchTerm, $options: 'i' } }
+                ]
+            });
+            console.log(docs);
+            res.json(docs)
+            console.log('Reached here');
+        }
+        else{
+            res.redirect('/docs')
+        }
     }
     catch(error){
         console.error('Failed search --------->', error)

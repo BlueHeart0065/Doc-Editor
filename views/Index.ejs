@@ -7,20 +7,23 @@
 </head>
 <body>
     <input type="text" id="search-bar">
-    <% if searchedDocs.length > 0 { %>
-        <% for (let item of searchedDocs) {%>
-            <div style="background-color: antiquewhite;">
-                <p><%= item.title %> --- [ <%= item.updatedAt %> ]</p>
-            </div>
-        <% } %>
-    <% } %>
     
+    <ul id="Doc-list" style="background-color: antiquewhite;"> 
+
+    </ul>
     <form action="/docs/new" method="post">
         <button name="new" id="new">+ New Doc</button>
     </form>
-    <% for (let doc of docs) {%>
-        <li><p><%= doc.title%> - </p><a href="/docs/<%= doc.id %>/edit">Link</a></li>
-    <% } %>
+    <select name="" id="">
+        <option value="">A-Z</option>
+        <option value="">Date created</option>
+        <option value="">Date modified</option>
+    </select>
+    <ul >
+        <% for (let doc of docs) {%>
+            <li><p><%= doc.title%> - </p><a href="/docs/<%= doc.id %>/edit">Link</a></li>
+        <% } %>
+        </ul>
     <script src="/search.js"></script>
 </body>
 </html>
