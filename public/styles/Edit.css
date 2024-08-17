@@ -1,0 +1,6 @@
+#editor{
+    width: 70vw;
+    height: 70vw;
+    resize: none;
+    border: 1px solid gray;
+}

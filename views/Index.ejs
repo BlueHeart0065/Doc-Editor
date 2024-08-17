@@ -14,16 +14,17 @@
     <form action="/docs/new" method="post">
         <button name="new" id="new">+ New Doc</button>
     </form>
-    <select name="" id="">
-        <option value="">A-Z</option>
-        <option value="">Date created</option>
-        <option value="">Date modified</option>
+    <select name="sort" id="sort">
+        <option value="Date modified">Date modified</option>
+        <option value="Date created">Date created</option>
+        <option value="A-Z">A-Z</option>
     </select>
     <ul >
         <% for (let doc of docs) {%>
-            <li><p><%= doc.title%> - </p><a href="/docs/<%= doc.id %>/edit">Link</a></li>
+            <li><p><%= doc.title%> - <a href="/docs/<%= doc.id %>/edit">Link</a></p></li>
         <% } %>
-        </ul>
-    <script src="/search.js"></script>
+    </ul>
+    <script src="/scripts/search.js"></script>
+    <script src="/scripts/sort.js"></script>
 </body>
 </html>

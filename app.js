@@ -5,6 +5,7 @@ const Doc = require('./models/Doc');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const ExpressError = require('./utils/ExpressError');
 
 const app = express();
 app.set('view engine','ejs');
@@ -22,7 +23,6 @@ mongoose.connect('mongodb://localhost/ProjectDocs')
     console.log('Connection error', err);
 })
 
-
 app.use(session({
     secret : 'mysecretistatya',
     resave: false,
@@ -33,8 +33,18 @@ app.use(session({
 
 
 app.get('/docs',async (req,res) => {
+    const sortQuery = req.query.q;
+
+    if (sortQuery === 'A-Z') {
+        sortCriteria = { title: 1 }; 
+    } else if (sortQuery === 'Date modified') {
+        sortCriteria = { updatedAt: -1 }; 
+    } else {
+        sortCriteria = { createdAt: -1 }; 
+    }
+
     try{
-        const docs = await Doc.find({});
+        const docs = await Doc.find({}).sort(sortCriteria);
         res.render('Index.ejs', {docs, serachedDocs : null});
     }
     catch(error){
@@ -63,7 +73,7 @@ app.get('/docs/search', async(req,res) => {
     catch(error){
         console.error('Failed search --------->', error)
     }
-})
+});
 
 app.post('/docs/new', async (req,res) => {
 
@@ -99,7 +109,7 @@ app.post('/docs/:id/edit', async (req,res) => {
                 document = await Doc.findById(documentId);
                 document.title = title || document.title;
                 currentDate = new Date
-                document.content = content || document.content;
+                document.content = content;
                 document.updatedAt = currentDate || document.updatedAt;
                 await document.save();
                 console.log('Autosaved')

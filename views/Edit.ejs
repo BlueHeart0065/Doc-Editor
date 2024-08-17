@@ -4,14 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="/styles/Edit.css">
 </head>
 <body>
     <span id="id" style="display: none;"><%= id %></span>
+    <label for="fontSelector">Choose Font: </label>
+    <select id="fontSelector">
+      <option value="Arial, sans-serif">Arial</option>
+      <option value="Times New Roman, serif">Times New Roman</option>
+      <option value="Courier New, monospace">Courier New</option>
+      <option value="Georgia, serif">Georgia</option>
+      <option value="Verdana, sans-serif">Verdana</option>
+    </select>
     <input type="text" name = "title" id="title" value="<%= doc.title  %>">
-    <textarea name="editor" id="editor">
+    <div id="editor" name="editor" contenteditable="true">
         <%= doc.content  %>
-    </textarea>
-    <script src="/autosave.js"></script>
+    </div>
     <a href="/docs"><button>Go Back</button></a>
+    <script src="/scripts/autosave.js"></script>
+    <script src="/scripts/font.js"></script>
+
 </body>
 </html>
