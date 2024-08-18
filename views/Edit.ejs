@@ -5,24 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="/styles/Edit.css">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    
+
 </head>
 <body>
     <span id="id" style="display: none;"><%= id %></span>
-    <label for="fontSelector">Choose Font: </label>
-    <select id="fontSelector">
-      <option value="Arial, sans-serif">Arial</option>
-      <option value="Times New Roman, serif">Times New Roman</option>
-      <option value="Courier New, monospace">Courier New</option>
-      <option value="Georgia, serif">Georgia</option>
-      <option value="Verdana, sans-serif">Verdana</option>
-    </select>
     <input type="text" name = "title" id="title" value="<%= doc.title  %>">
     <div id="editor" name="editor" contenteditable="true">
-        <%= doc.content  %>
+        <%- doc.content  %>
     </div>
     <a href="/docs"><button>Go Back</button></a>
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script src="/scripts/autosave.js"></script>
-    <script src="/scripts/font.js"></script>
+    <script src="/scripts/quill.js"></script>
+    
 
 </body>
 </html>

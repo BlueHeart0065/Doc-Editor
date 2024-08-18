@@ -1,9 +1,8 @@
-const editor = document.getElementById('editor')
 const title = document.getElementById('title')
 const documentId = document.getElementById('id');
 
 const getContent = () => {
-    return {title : title.value , content : editor.innerHTML ,documentId : documentId.innerHTML} 
+    return {title : title.value , content : quill.root.innerHTML ,documentId : documentId.innerHTML} 
 }
 
 const autosave = async () => {

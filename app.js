@@ -99,7 +99,7 @@ app.get('/docs/:id/edit', async (req,res) => {
     }
 })
 
-app.post('/docs/:id/edit', async (req,res) => {
+app.post('/docs/:id/edit',async (req,res) => {
     const {title , content, documentId } = req.body;
     try{
         let document;
