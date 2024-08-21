@@ -1,30 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="/styles/Index.css">
 </head>
-<body>
-    <input type="text" id="search-bar">
-    
-    <ul id="Doc-list" style="background-color: antiquewhite;"> 
 
-    </ul>
-    <form action="/docs/new" method="post">
-        <button name="new" id="new">+ New Doc</button>
-    </form>
-    <select name="sort" id="sort">
-        <option value="Date modified">Date modified</option>
-        <option value="Date created">Date created</option>
-        <option value="A-Z">A-Z</option>
-    </select>
-    <ul >
-        <% for (let doc of docs) {%>
-            <li><p><%= doc.title%> - <a href="/docs/<%= doc.id %>/edit">Link</a></p></li>
-        <% } %>
-    </ul>
-    <script src="/scripts/search.js"></script>
-    <script src="/scripts/sort.js"></script>
+<body>
+    <div class="topbar">
+        <a class="logo" href="/docs"><img src="/images/logo.svg" alt=""></a>
+        <div class="brand">Doc Editor</div>
+        <div class="search">
+            <input type="text" id="search-bar" placeholder="Search">
+            <img src="/images/search.svg" alt="">
+        </div>
+        <div class="options">
+            <a href="/docs">Dashboard</a>
+            <a href="/docs">Projects</a>
+            <a href="/docs">Friends</a>
+            <a href="/docs">Settings</a>
+        </div>
+        <div class="profile" href="/docs">
+            <img src="/images/sahil.png" alt="" class="profile-pic">
+            <div class="name">Sahil Batgeri</div>
+        </div>
+    </div>
+
+    <div class="hero">
+        <div class="header">
+            <p>Recent Documents</p>
+            <form action="/docs/new" method="post">
+                <button name="new" id="new">+ New Doc</button>
+            </form>
+        </div>
+        <div class="details">
+            <select name="sort" id="sort">
+                <option value="Date modified">Date modified</option>
+                <option value="Date created">Date created</option>
+                <option value="A-Z">A-Z</option>
+            </select>
+        </div>
+
+        <ul>
+            <% for (let doc of docs) {%>
+                <li>
+                    <p>
+                        <%= doc.title%> - <a href="/docs/<%= doc.id %>/edit">Link</a>
+                    </p>
+                </li>
+                <% } %>
+        </ul>
+    </div>
+
+    <ul id="Doc-list" style="background-color: antiquewhite;">
+
+
+        <script src="/scripts/search.js"></script>
+        <script src="/scripts/sort.js"></script>
 </body>
+
 </html>

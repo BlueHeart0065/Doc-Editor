@@ -14,6 +14,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.static('public'));
+app.use(express.static('assets'));
 
 mongoose.connect('mongodb://localhost/ProjectDocs')
 .then(() => {
