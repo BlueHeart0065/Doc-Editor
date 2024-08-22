@@ -30,28 +30,36 @@
 
     <div class="hero">
         <div class="header">
-            <p>Recent Documents</p>
+            <p>Documents</p>
             <form action="/docs/new" method="post">
                 <button name="new" id="new">+ New Doc</button>
             </form>
         </div>
         <div class="details">
-            <select name="sort" id="sort">
-                <option value="Date modified">Date modified</option>
-                <option value="Date created">Date created</option>
-                <option value="A-Z">A-Z</option>
-            </select>
+            <p>23 Documents</p>
+            <div class="sort-container">
+                <img src="/images/sort.svg" alt="">
+                <select name="sort" id="sort">
+                    <option value="Date modified">Date modified</option>
+                    <option value="Date created"><img src="/images/sort.svg" alt="">Date created</option>
+                    <option value="A-Z"><img src="/images/sort.svg" alt="">A-Z</option>
+                </select>
+            </div>
+            
         </div>
 
-        <ul>
+        <div class="document-container" >
             <% for (let doc of docs) {%>
-                <li>
-                    <p>
-                        <%= doc.title%> - <a href="/docs/<%= doc.id %>/edit">Link</a>
-                    </p>
-                </li>
-                <% } %>
-        </ul>
+                <a class="document" href="/docs/<%= doc.id %>/edit">
+                    <div class="title">
+                        <p>
+                            <%= doc.title%> 
+                        </p>
+                    </div>
+                </a>
+            <% } %>
+            
+        </div>
     </div>
 
     <ul id="Doc-list" style="background-color: antiquewhite;">

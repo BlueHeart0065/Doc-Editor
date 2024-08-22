@@ -128,5 +128,82 @@ body{
             }
         }
     }
+
+    .details{
+        font-size: 0.8vw;
+        display: flex;
+        flex-direction: row;
+        margin-top: 1vw;
+
+        .sort-container{
+            display: flex;
+            flex-direction: row;
+            margin-left: auto;
+            border: 1px solid rgb(212, 212, 212);
+            border-radius: 10px;
+            padding: 0vw 1vw;
+            gap: 0.5vw;
+            img{
+                width: 1.1vw;
+                height: 1.1vw;
+                margin-top: 0.7vw;
+            }
+            b{
+                font-size: 0.8vw;
+                margin-top: 0.7vw;
+            }
+            select{
+                outline: none;
+                border: none;
+
+                select:focus{
+                    outline: none;
+                    box-shadow: none;
+                    padding: 1vw;
+                }
+            }
+        }
+    }
+
+    .document-container{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2vw;
+        margin-top: 3vw;
+        transition: all 0.3s ease;
+        a{
+            text-decoration: none;
+            color: black;
+            width: 18vw;
+            height: 15vw;
+            background-color: rgb(245, 245, 245);
+            border-radius: 10px;
+            box-shadow: 0vw 0vw 0.5vw rgb(219, 219, 219);
+            overflow: hidden;
+
+            .title{
+                height: 6vw;
+                margin-top: 10vw ;
+                background-color: white;
+                box-shadow: 0vw 0vw 0.5vw rgb(219, 219, 219);
+                p{
+                    font-size: 0.8vw;
+                    padding: 1vw;
+                    font-weight: bold;
+                }
+            }
+
+            
+
+        }
+
+        a:hover{
+            transform: translateY(-0.5vw);
+            transition: all 0.3s ease;
+
+        }
+
+        
+    }
 }
 
