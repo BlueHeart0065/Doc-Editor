@@ -6,8 +6,13 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const ExpressError = require('./utils/ExpressError');
+const {Server} = require('socket.io');
+const http = require('http');
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
 app.set('view engine','ejs');
 app.set('views',path.join(__dirname,'views'));
 app.use(express.urlencoded({extended: true}));
@@ -15,6 +20,8 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.static('public'));
 app.use(express.static('assets'));
+
+
 
 mongoose.connect('mongodb://localhost/ProjectDocs')
 .then(() => {
@@ -130,6 +137,25 @@ app.post('/docs/:id/edit',async (req,res) => {
     }
 });
 
-app.listen(3000,() => {
+io.on('join document', (socket) => {
+
+    socket.join(documentId);
+    console.log(`User joined document: ${documentId}`);
+
+    // Notify other users in the same document
+    socket.to(documentId).emit('user connected', `A user has joined document ${documentId}`);
+
+    // Notify when a user disconnects
+    socket.on('disconnect', () => {
+      console.log('user disconnected');
+      socket.to(documentId).emit('user disconnected', `A user has left document ${documentId}`);
+    });
+});
+
+// app.listen(3000,() => {
+//     console.log('App listening at 3000')
+// });
+
+server.listen(3000,() => {
     console.log('App listening at 3000')
 })
