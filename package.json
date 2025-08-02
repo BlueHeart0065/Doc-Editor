@@ -1,11 +1,14 @@
 {
   "name": "project-docs",
   "version": "1.0.0",
-  "description": "",
+  "description": "A modern document editor similar to Google Docs with real-time collaboration features",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": ["document", "editor", "collaboration", "real-time", "docs"],
   "author": "Sahil Batgeri",
   "license": "ISC",
   "dependencies": {

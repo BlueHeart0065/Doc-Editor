@@ -3,60 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title><%= doc.title %> - Doc Editor</title>
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="/styles/Edit.css">
     <link rel="stylesheet" href="/styles/templates/topbar.css">
-
 </head>
 <body>
     <div class="topbar">
         <a class="logo" href="/docs"><img src="/images/logo.svg" alt=""></a>
-        
+        <div class="brand">Doc Editor</div>
+        <div class="document-info">
+            <span class="document-status">
+                <span id="save-indicator" class="save-indicator">Saved</span>
+                <span class="last-modified">Last modified: <%= new Date(doc.updatedAt).toLocaleString() %></span>
+            </span>
+        </div>
         <div class="options">
             <a href="/docs">Dashboard</a>
-            <a href="/docs">Projects</a>
-            <a href="/docs">Friends</a>
-            <a href="/docs">Settings</a>
+            <button id="share-btn" class="share-btn">Share</button>
+            <button id="export-btn" class="export-btn">Export</button>
         </div>
-        <div class="profile" href="/docs">
+        <div class="profile">
             <img src="/images/sahil.png" alt="" class="profile-pic">
             <div class="name">Sahil Batgeri</div>
         </div>
     </div>
     
+    <!-- Collaboration Status -->
+    <div class="collaboration-bar">
+        <div class="active-users" id="active-users">
+            <span class="users-label">Active users:</span>
+            <div class="user-avatars" id="user-avatars">
+                <div class="user-avatar current-user" title="You">
+                    <img src="/images/sahil.png" alt="You">
+                </div>
+            </div>
+        </div>
+        <div class="document-actions">
+            <button id="word-count-btn" class="action-btn" title="Word Count">📊</button>
+            <button id="fullscreen-btn" class="action-btn" title="Fullscreen">⛶</button>
+        </div>
+    </div>
+    
+    <!-- Hidden elements for data -->
     <span id="id" style="display: none;"><%= id %></span>
-    <input type="text" name = "title" id="title" value="<%= doc.title  %>">
-    <div id="editor" name="editor" contenteditable="true">
-        <%- doc.content  %>
+    
+    <!-- Document Title -->
+    <div class="title-container">
+        <input type="text" name="title" id="title" value="<%= doc.title %>" placeholder="Untitled Document">
+    </div>
+    
+    <!-- Editor Container -->
+    <div class="editor-container">
+        <div id="editor" name="editor" contenteditable="true">
+            <%- doc.content %>
+        </div>
     </div>
 
-    <div class="online" id="online"></div>
-    <a href="/docs"><button>Go Back</button></a>
+    <!-- Floating Action Button -->
+    <div class="fab-container">
+        <button id="fab-main" class="fab">⚙️</button>
+        <div class="fab-options" id="fab-options">
+            <button class="fab-option" id="back-to-docs" title="Back to Documents">📂</button>
+            <button class="fab-option" id="print-doc" title="Print">🖨️</button>
+            <button class="fab-option" id="download-doc" title="Download">⬇️</button>
+        </div>
+    </div>
+
+    <!-- Word Count Modal -->
+    <div id="word-count-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Document Statistics</h3>
+                <button class="close-btn" id="close-word-count">&times;</button>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-label">Words:</span>
+                    <span class="stat-value" id="word-count">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Characters:</span>
+                    <span class="stat-value" id="char-count">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Characters (no spaces):</span>
+                    <span class="stat-value" id="char-count-no-spaces">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Paragraphs:</span>
+                    <span class="stat-value" id="paragraph-count">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="share-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Share Document</h3>
+                <button class="close-btn" id="close-share">&times;</button>
+            </div>
+            <div class="share-options">
+                <div class="share-option">
+                    <label>Document Link:</label>
+                    <div class="link-container">
+                        <input type="text" id="document-link" readonly>
+                        <button id="copy-link" class="copy-btn">Copy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-    <script src="/scripts/autosave.js"></script>
-    <script src="/scripts/quill.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/scripts/quill.js"></script>
+    <script src="/scripts/autosave.js"></script>
+    <script src="/scripts/collaboration.js"></script>
     <script>
+        // Initialize Socket.IO connection
         const socket = io();
         const documentId = '<%= id %>';
 
         // Join the document-specific room
-        socket.emit('join document', documentId);
+        socket.emit('join-document', documentId);
 
-        // Listen for other users joining
-        socket.on('user connected', (message) => {
-            const div = document.createElement('div');
-            div.textContent = 'User Online';
-            document.getElementById('online').appendChild(div);
+        // Handle real-time updates
+        socket.on('document-update', (data) => {
+            if (data.title !== document.getElementById('title').value) {
+                document.getElementById('title').value = data.title;
+            }
+            // Note: We should be careful about updating content while user is typing
         });
 
-        // Listen for other users disconnecting
-        socket.on('user disconnected', (message) => {
-            const div = document.createElement('div');
-            div.textContent = message;
-            document.getElementById('notifications').appendChild(div);
+        // Handle user connections
+        socket.on('user-connected', (message) => {
+            console.log(message);
+            addActiveUser();
         });
+
+        socket.on('user-disconnected', (message) => {
+            console.log(message);
+            removeActiveUser();
+        });
+
+        function addActiveUser() {
+            const userAvatars = document.getElementById('user-avatars');
+            const newUser = document.createElement('div');
+            newUser.className = 'user-avatar';
+            newUser.innerHTML = '<div class="avatar-placeholder">U</div>';
+            userAvatars.appendChild(newUser);
+        }
+
+        function removeActiveUser() {
+            const userAvatars = document.getElementById('user-avatars');
+            const users = userAvatars.querySelectorAll('.user-avatar:not(.current-user)');
+            if (users.length > 0) {
+                users[users.length - 1].remove();
+            }
+        }
+
+        // Set document link for sharing
+        document.getElementById('document-link').value = window.location.href;
     </script>
 </body>
 </html>

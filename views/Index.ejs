@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Doc Editor</title>
     <link rel="stylesheet" href="/styles/Index.css">
     <link rel="stylesheet" href="/styles/templates/topbar.css">
 </head>
@@ -14,7 +14,7 @@
         <a class="logo" href="/docs"><img src="/images/logo.svg" alt=""></a>
         <div class="brand">Doc Editor</div>
         <div class="search">
-            <input type="text" id="search-bar" placeholder="Search">
+            <input type="text" id="search-bar" placeholder="Search documents...">
             <img src="/images/search.svg" alt="">
         </div>
         <div class="options">
@@ -29,6 +29,15 @@
         </div>
     </div>
 
+    <!-- Search Results Container -->
+    <div class="search-results" id="search-results" style="display: none;">
+        <div class="search-header">
+            <h3>Search Results</h3>
+            <button id="close-search" class="close-btn">&times;</button>
+        </div>
+        <ul id="Doc-list"></ul>
+    </div>
+
     <div class="hero">
         <div class="header">
             <p>Documents</p>
@@ -37,35 +46,56 @@
             </form>
         </div>
         <div class="details">
-            <p>23 Documents</p>
+            <p><span id="doc-count"><%= docs.length %></span> Documents</p>
             <div class="sort-container">
                 <img src="/images/sort.svg" alt="">
                 <select name="sort" id="sort">
                     <option value="Date modified">Date modified</option>
-                    <option value="Date created"><img src="/images/sort.svg" alt="">Date created</option>
-                    <option value="A-Z"><img src="/images/sort.svg" alt="">A-Z</option>
+                    <option value="Date created">Date created</option>
+                    <option value="A-Z">A-Z</option>
                 </select>
             </div>
         </div>
 
-        <div class="document-container" >
+        <div class="document-container" id="document-container">
             <% for (let doc of docs) {%>
-                <a class="document" href="/docs/<%= doc.id %>/edit">
-                    <div class="title">
-                        <p>
-                            <%= doc.title%> 
-                        </p>
+                <div class="document-wrapper">
+                    <a class="document" href="/docs/<%= doc.id %>/edit">
+                        <div class="title">
+                            <p><%= doc.title%></p>
+                        </div>
+                    </a>
+                    <div class="document-actions">
+                        <button class="delete-btn" data-id="<%= doc.id %>" title="Delete document">🗑️</button>
+                        <button class="duplicate-btn" data-id="<%= doc.id %>" title="Duplicate document">📄</button>
+                        <span class="last-modified">Modified: <%= new Date(doc.updatedAt).toLocaleDateString() %></span>
                     </div>
-                </a>
+                </div>
             <% } %>
             
+            <% if (docs.length === 0) { %>
+                <div class="no-documents">
+                    <p>No documents found. Create your first document to get started!</p>
+                </div>
+            <% } %>
         </div>
     </div>
 
-
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to delete this document? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button id="confirm-delete" class="danger-btn">Delete</button>
+                <button id="cancel-delete" class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <script src="/scripts/search.js"></script>
     <script src="/scripts/sort.js"></script>
+    <script src="/scripts/documents.js"></script>
     
 </body>
 
