@@ -15,6 +15,9 @@ const autosave = async () => {
     const route = '/docs/' + docId + "/edit";
     
     if (docTitle || content) {
+        // Emit start event
+        window.dispatchEvent(new CustomEvent('autosave-start'));
+        
         try{
             const response = await fetch(route, {
                 method: 'POST',
@@ -29,12 +32,14 @@ const autosave = async () => {
             if (response.ok) {
                 console.log('Document autosaved');
                 showSaveStatus('Saved', 'success');
+                window.dispatchEvent(new CustomEvent('autosave-success'));
             } else {
                 throw new Error(result.error || 'Failed to save');
             }
         } catch(error){
             console.error('Failed to autosave', error);
             showSaveStatus('Save failed', 'error');
+            window.dispatchEvent(new CustomEvent('autosave-error'));
         }
     }
 };

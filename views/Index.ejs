@@ -1,31 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doc Editor</title>
+    <title>Doc Editor - Modern Document Management</title>
     <link rel="stylesheet" href="/styles/Index.css">
     <link rel="stylesheet" href="/styles/templates/topbar.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
 </head>
 
 <body>
     <div class="topbar">
-        <a class="logo" href="/docs"><img src="/images/logo.svg" alt=""></a>
-        <div class="brand">Doc Editor</div>
+        <a class="logo" href="/docs">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                </svg>
+            </div>
+            <div class="brand">Doc Editor</div>
+        </a>
+        
         <div class="search">
-            <input type="text" id="search-bar" placeholder="Search documents...">
-            <img src="/images/search.svg" alt="">
+            <div class="search-container">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input type="text" id="search-bar" placeholder="Search documents...">
+            </div>
         </div>
+        
         <div class="options">
-            <a href="/docs">Dashboard</a>
-            <a href="/docs">Projects</a>
-            <a href="/docs">Friends</a>
-            <a href="/docs">Settings</a>
+            <a href="/docs" class="nav-link active">Dashboard</a>
+            <a href="/docs" class="nav-link">Templates</a>
+            <a href="/docs" class="nav-link">Recent</a>
         </div>
-        <div class="profile" href="/docs">
-            <img src="/images/sahil.png" alt="" class="profile-pic">
-            <div class="name">Sahil Batgeri</div>
+
+        <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
+            <svg id="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg id="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+        
+        <div class="profile">
+            <img src="/images/sahil.png" alt="Profile" class="profile-pic">
+            <div class="profile-info">
+                <div class="name">Sahil Batgeri</div>
+                <div class="role">Editor</div>
+            </div>
         </div>
     </div>
 
@@ -33,26 +67,55 @@
     <div class="search-results" id="search-results" style="display: none;">
         <div class="search-header">
             <h3>Search Results</h3>
-            <button id="close-search" class="close-btn">&times;</button>
+            <button id="close-search" class="close-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
         </div>
         <ul id="Doc-list"></ul>
     </div>
 
     <div class="hero">
         <div class="header">
-            <p>Documents</p>
-            <form action="/docs/new" method="post">
-                <button name="new" id="new">+ New Doc</button>
+            <h1>Documents</h1>
+            <form action="/docs/new" method="post" style="margin: 0;">
+                <button type="submit" class="new-doc-btn">New Document</button>
             </form>
         </div>
+        
         <div class="details">
-            <p><span id="doc-count"><%= docs.length %></span> Documents</p>
+            <div class="document-stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="doc-count"><%= docs.length %></div>
+                    <div class="stat-label">Documents</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number"><%= docs.filter(doc => {
+                        const today = new Date();
+                        const docDate = new Date(doc.updatedAt);
+                        return today.toDateString() === docDate.toDateString();
+                    }).length %></div>
+                    <div class="stat-label">Edited Today</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number"><%= docs.filter(doc => {
+                        const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+                        return new Date(doc.updatedAt) >= weekAgo;
+                    }).length %></div>
+                    <div class="stat-label">This Week</div>
+                </div>
+            </div>
+            
             <div class="sort-container">
-                <img src="/images/sort.svg" alt="">
+                <svg class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M7 12h10m-7 6h4"></path>
+                </svg>
                 <select name="sort" id="sort">
                     <option value="Date modified">Date modified</option>
                     <option value="Date created">Date created</option>
-                    <option value="A-Z">A-Z</option>
+                    <option value="A-Z">Alphabetical</option>
                 </select>
             </div>
         </div>
@@ -61,21 +124,56 @@
             <% for (let doc of docs) {%>
                 <div class="document-wrapper">
                     <a class="document" href="/docs/<%= doc.id %>/edit">
-                        <div class="title">
-                            <p><%= doc.title%></p>
+                        <div class="document-thumbnail">
+                            <div class="thumbnail-content <%= doc.content ? '' : 'empty' %>">
+                                <% if (doc.content) { %>
+                                    <%- doc.content.replace(/<[^>]*>/g, '').substring(0, 200) %>
+                                <% } else { %>
+                                    <div style="text-align: center;">
+                                        Empty Document
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                        <div class="document-info">
+                            <h3 class="document-title"><%= doc.title %></h3>
+                            <div class="document-meta">
+                                <span class="document-date"><%= new Date(doc.updatedAt).toLocaleDateString('en-US', { 
+                                    month: 'short', 
+                                    day: 'numeric',
+                                    year: new Date(doc.updatedAt).getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+                                }) %></span>
+                                <span class="document-size">
+                                    <%= doc.content ? Math.ceil(doc.content.replace(/<[^>]*>/g, '').length / 1000) : 0 %>k chars
+                                </span>
+                            </div>
                         </div>
                     </a>
                     <div class="document-actions">
-                        <button class="delete-btn" data-id="<%= doc.id %>" title="Delete document">🗑️</button>
-                        <button class="duplicate-btn" data-id="<%= doc.id %>" title="Duplicate document">📄</button>
-                        <span class="last-modified">Modified: <%= new Date(doc.updatedAt).toLocaleDateString() %></span>
+                        <button class="action-btn delete-btn" data-id="<%= doc.id %>" title="Delete document">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3,6 5,6 21,6"></polyline>
+                                <path d="m19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"></path>
+                            </svg>
+                        </button>
+                        <button class="action-btn duplicate-btn" data-id="<%= doc.id %>" title="Duplicate document">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             <% } %>
             
             <% if (docs.length === 0) { %>
                 <div class="no-documents">
-                    <p>No documents found. Create your first document to get started!</p>
+                    <div class="empty-illustration">📚</div>
+                    <h3>No documents yet</h3>
+                    <p>Create your first document to get started with your modern document management experience.</p>
+                    <form action="/docs/new" method="post" style="margin: 0;">
+                        <button type="submit" class="new-doc-btn">Create First Document</button>
+                    </form>
                 </div>
             <% } %>
         </div>
@@ -84,10 +182,20 @@
     <!-- Confirmation Modal -->
     <div id="confirmation-modal" class="modal" style="display: none;">
         <div class="modal-content">
-            <h3>Confirm Deletion</h3>
-            <p>Are you sure you want to delete this document? This action cannot be undone.</p>
+            <div class="modal-header">
+                <h3>Confirm Deletion</h3>
+                <button class="close-btn" id="modal-close">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div style="padding: 0 2rem 1rem;">
+                <p>Are you sure you want to delete this document? This action cannot be undone.</p>
+            </div>
             <div class="modal-actions">
-                <button id="confirm-delete" class="danger-btn">Delete</button>
+                <button id="confirm-delete" class="danger-btn">Delete Document</button>
                 <button id="cancel-delete" class="cancel-btn">Cancel</button>
             </div>
         </div>
@@ -96,6 +204,7 @@
     <script src="/scripts/search.js"></script>
     <script src="/scripts/sort.js"></script>
     <script src="/scripts/documents.js"></script>
+    <script src="/scripts/theme.js"></script>
     
 </body>
 

@@ -12,17 +12,25 @@ function updateWordCount() {
     const characters = text.length;
     const charactersNoSpaces = text.replace(/\s/g, '').length;
     const paragraphs = content.split('</p>').length - 1 || 1;
+    const readingTime = Math.ceil(words / 200); // Average reading speed: 200 words per minute
     
     // Update DOM elements if modal is open
     const wordCountElement = document.getElementById('word-count');
     const charCountElement = document.getElementById('char-count');
     const charCountNoSpacesElement = document.getElementById('char-count-no-spaces');
     const paragraphCountElement = document.getElementById('paragraph-count');
+    const readingTimeElement = document.getElementById('reading-time');
+    const lastSavedElement = document.getElementById('last-saved');
     
-    if (wordCountElement) wordCountElement.textContent = words;
-    if (charCountElement) charCountElement.textContent = characters;
-    if (charCountNoSpacesElement) charCountNoSpacesElement.textContent = charactersNoSpaces;
-    if (paragraphCountElement) paragraphCountElement.textContent = paragraphs;
+    if (wordCountElement) wordCountElement.textContent = words.toLocaleString();
+    if (charCountElement) charCountElement.textContent = characters.toLocaleString();
+    if (charCountNoSpacesElement) charCountNoSpacesElement.textContent = charactersNoSpaces.toLocaleString();
+    if (paragraphCountElement) paragraphCountElement.textContent = paragraphs.toLocaleString();
+    if (readingTimeElement) readingTimeElement.textContent = `${readingTime} min`;
+    if (lastSavedElement) {
+        const now = new Date();
+        lastSavedElement.textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    }
 }
 
 // Modal handling
