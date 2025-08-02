@@ -32,6 +32,13 @@ const autosave = async () => {
             if (response.ok) {
                 console.log('Document autosaved');
                 showSaveStatus('Saved', 'success');
+                
+                // Update title if server modified it due to duplicate prevention
+                if (result.title && result.title !== title.value) {
+                    title.value = result.title;
+                    showSaveStatus('Title updated to prevent duplicates', 'warning');
+                }
+                
                 window.dispatchEvent(new CustomEvent('autosave-success'));
             } else {
                 throw new Error(result.error || 'Failed to save');
@@ -65,7 +72,9 @@ function showSaveStatus(message, type) {
         font-weight: 500;
         z-index: 1000;
         transition: opacity 0.3s ease;
-        ${type === 'success' ? 'background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;' : 'background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;'}
+        ${type === 'success' ? 'background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;' : 
+          type === 'warning' ? 'background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7;' : 
+          'background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;'}
     `;
     
     document.body.appendChild(statusElement);

@@ -89,9 +89,43 @@ app.get('/docs/search', async(req,res) => {
     }
 });
 
+// Helper function to generate unique document title
+async function generateUniqueTitle(baseTitle = 'Untitled Document') {
+    try {
+        // First check if the base title exists
+        const existingDoc = await Doc.findOne({ title: baseTitle });
+        if (!existingDoc) {
+            return baseTitle;
+        }
+        
+        // If base title exists, find all documents with similar names
+        const existingDocs = await Doc.find({
+            title: { $regex: `^${baseTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}( \\d+)?$`, $options: 'i' }
+        }).sort({ title: 1 });
+        
+        let maxNumber = 0;
+        const basePattern = new RegExp(`^${baseTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}( (\\d+))?$`, 'i');
+        
+        existingDocs.forEach(doc => {
+            const match = doc.title.match(basePattern);
+            if (match) {
+                const number = match[2] ? parseInt(match[2], 10) : 0;
+                maxNumber = Math.max(maxNumber, number);
+            }
+        });
+        
+        return `${baseTitle} ${maxNumber + 1}`;
+    } catch (error) {
+        console.error('Error generating unique title:', error);
+        // Fallback to timestamp-based naming
+        return `${baseTitle} ${Date.now()}`;
+    }
+}
+
 app.post('/docs/new', async (req,res) => {
     try{
-        const document = new Doc({title : `Untitled Document`, content : ''});
+        const uniqueTitle = await generateUniqueTitle('Untitled Document');
+        const document = new Doc({title : uniqueTitle, content : ''});
         await document.save();
         req.session.documentId = document.id;
         res.redirect(`/docs/${document.id}/edit`);
@@ -128,7 +162,25 @@ app.post('/docs/:id/edit',async (req,res) => {
                 if (!document) {
                     return res.status(404).json({ error: 'Document not found' });
                 }
-                document.title = title || document.title;
+                
+                // Check if title has changed and ensure uniqueness
+                if (title && title !== document.title) {
+                    // Check if another document already has this title
+                    const existingDoc = await Doc.findOne({ 
+                        title: title, 
+                        _id: { $ne: documentId } // Exclude current document
+                    });
+                    
+                    if (existingDoc) {
+                        // Generate unique title if duplicate found
+                        document.title = await generateUniqueTitle(title);
+                    } else {
+                        document.title = title;
+                    }
+                } else if (title) {
+                    document.title = title;
+                }
+                
                 const currentDate = new Date();
                 document.content = content;
                 document.updatedAt = currentDate;
@@ -142,7 +194,11 @@ app.post('/docs/:id/edit',async (req,res) => {
                     updatedAt: document.updatedAt
                 });
                 
-                return res.status(200).json({ success: true, message: 'Document saved' });
+                return res.status(200).json({ 
+                    success: true, 
+                    message: 'Document saved',
+                    title: document.title // Send back the actual title in case it was modified
+                });
             }
             catch(error) {
                 console.error('Error fetching doc ID ----------->',error);
@@ -182,8 +238,12 @@ app.post('/docs/:id/duplicate', async (req, res) => {
             return res.status(404).json({ error: 'Document not found' });
         }
         
+        // Generate unique title for the duplicated document
+        const baseTitle = `${originalDoc.title} (Copy)`;
+        const uniqueTitle = await generateUniqueTitle(baseTitle);
+        
         const duplicatedDoc = new Doc({
-            title: `${originalDoc.title} (Copy)`,
+            title: uniqueTitle,
             content: originalDoc.content,
             createdAt: new Date(),
             updatedAt: new Date()
